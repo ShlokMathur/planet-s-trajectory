@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planetary Positions in 3D</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">Drag to rotate, scroll to zoom</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+    <script>
+        // Scene, camera, and renderer setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add a light source
+        const light = new THREE.PointLight(0xffffff, 1, 0);
+        light.position.set(0, 0, 0); // Sun position
+        scene.add(light);
+
+        // Create the Sun
+        const sunGeometry = new THREE.SphereGeometry(10, 32, 32);
+        const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        scene.add(sun);
+
+        // Planet data
+        const planets = [
+            { name: "Mercury", x: 17060390, y: -65304470, z: -6895686, color: 0xaaaaaa },
+            { name: "Venus", x: -39849970, y: 99715800, z: 3657895, color: 0xffcc33 },
+            { name: "Earth", x: -70157170, y: 129342600, z: 0, color: 0x3333ff },
+            { name: "Mars", x: -240047400, y: -46990820, z: 4916547, color: 0xff0000 },
+            { name: "Jupiter", x: -297295400, y: 723026100, z: 3653242, color: 0xffa500 },
+        ];
+
+        // Create planets
+        planets.forEach(planet => {
+            const geometry = new THREE.SphereGeometry(2, 32, 32);
+            const material = new THREE.MeshStandardMaterial({ color: planet.color });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(planet.x / 1000000, planet.y / 1000000, planet.z / 1000000); // Scale down for visualization
+            scene.add(mesh);
+        });
+
+        // Orbit controls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        camera.position.z = 500;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
